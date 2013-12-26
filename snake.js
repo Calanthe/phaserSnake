@@ -13,12 +13,13 @@ var initSnakeLength = 3;
 var food;
 var grid = 20;
 var direction = 'right';
+var headPosition = [];
 
 function create() {
 
 	initSnake();
 
-	console.log(snake);
+	//console.log(snake);
 
 	//  The score
 	scoreString = 'Score : ';
@@ -31,6 +32,9 @@ function create() {
 function initSnake() {
 	for(var i = 0; i <= initSnakeLength - 1; i++) {
 		snake.push({x: i*grid, y: 0, rect: new Phaser.Rectangle(i*grid, 0, grid, grid)});
+		if (i === initSnakeLength - 1) {
+			headPosition = {x: i*grid, y: 0};
+		}
 	}
 }
 
@@ -49,7 +53,16 @@ function renderSnake() {
 }
 
 function update() {
+	if (headPosition.x < 100) {
+
+	var nextPosition = snake.shift(); //remove first position, tail of the snake
+	headPosition.x += 1*grid;
+
+	//add the new position to the beginning of the array
+	snake.push({x: headPosition.x, y: headPosition.y, rect: new Phaser.Rectangle(headPosition.x, headPosition.y, grid, grid)});
 	//  Run collision
 	//game.physics.collide(bullets, aliens, collisionHandler, null, this);
+
+	}
 }
 
