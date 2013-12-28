@@ -14,6 +14,7 @@ var food;
 var grid = 20;
 var direction = 'right';
 var headPosition = [];
+var velocity = 0.2;
 
 function create() {
 
@@ -52,17 +53,46 @@ function renderSnake() {
 	}
 }
 
+function moveHeadPosition() {
+	if (direction === 'left') {
+		headPosition.x -= grid*velocity;
+	}
+	else if (direction === 'right') {
+		headPosition.x += grid*velocity;
+	}
+	else if (direction === 'down') {
+		headPosition.y += grid*velocity;
+	}
+	else if (direction === 'up') {
+		headPosition.y -= grid*velocity;
+	}
+}
+
 function update() {
-	if (headPosition.x < 100) {
+	if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) && direction !== 'right')
+	{
+		direction = 'left';
+	}
+	else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN) && direction !== 'up')
+	{
+		direction = 'down';
+	}
+	else if (game.input.keyboard.isDown(Phaser.Keyboard.UP) && direction !== 'down')
+	{
+		direction = 'up';
+	}
+	else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) && direction !== 'left')
+	{
+		direction = 'right';
+	}
+
+	moveHeadPosition();
 
 	var nextPosition = snake.shift(); //remove first position, tail of the snake
-	headPosition.x += 1*grid;
 
 	//add the new position to the beginning of the array
 	snake.push({x: headPosition.x, y: headPosition.y, rect: new Phaser.Rectangle(headPosition.x, headPosition.y, grid, grid)});
 	//  Run collision
 	//game.physics.collide(bullets, aliens, collisionHandler, null, this);
-
-	}
 }
 
