@@ -2,11 +2,7 @@
  * Created by zosia on 26/12/13.
  */
 
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'snake', { preload: preload, create: create, update: update, render: render});
-
-function preload() {
-
-}
+var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'snake', {create: create, update: update, render: render});
 
 var snake = [];
 var initSnakeLength = 3;
@@ -32,7 +28,7 @@ function create() {
 
 function initSnake() {
 	for(var i = 0; i <= initSnakeLength - 1; i++) {
-		snake.push({x: i*grid, y: 0, rect: new Phaser.Rectangle(i*grid, 0, grid, grid)});
+		snake.push({x: i*grid*velocity, y: 0, rect: new Phaser.Rectangle(i*grid*velocity, 0, grid, grid)});
 		if (i === initSnakeLength - 1) {
 			headPosition = {x: i*grid, y: 0};
 		}
@@ -55,16 +51,16 @@ function renderSnake() {
 
 function moveHeadPosition() {
 	if (direction === 'left') {
-		headPosition.x -= grid*velocity;
+		headPosition.x -= grid;
 	}
 	else if (direction === 'right') {
-		headPosition.x += grid*velocity;
+		headPosition.x += grid;
 	}
 	else if (direction === 'down') {
-		headPosition.y += grid*velocity;
+		headPosition.y += grid;
 	}
 	else if (direction === 'up') {
-		headPosition.y -= grid*velocity;
+		headPosition.y -= grid;
 	}
 }
 
@@ -91,7 +87,7 @@ function update() {
 	var nextPosition = snake.shift(); //remove first position, tail of the snake
 
 	//add the new position to the beginning of the array
-	snake.push({x: headPosition.x, y: headPosition.y, rect: new Phaser.Rectangle(headPosition.x, headPosition.y, grid, grid)});
+	snake.push({x: headPosition.x * velocity, y: headPosition.y * velocity, rect: new Phaser.Rectangle(headPosition.x * velocity, headPosition.y * velocity, grid, grid)});
 	//  Run collision
 	//game.physics.collide(bullets, aliens, collisionHandler, null, this);
 }
