@@ -5,12 +5,13 @@
 var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'snake', {create: create, update: update, render: render});
 
 var snake = [];
-var initSnakeLength = 3;
+var snakeLength = 60;
 var food;
 var grid = 20;
 var direction = 'right';
 var headPosition = [];
 var velocity = 0.2;
+var play = true;
 
 function create() {
 
@@ -27,9 +28,9 @@ function create() {
 }
 
 function initSnake() {
-	for(var i = 0; i <= initSnakeLength - 1; i++) {
+	for(var i = 0; i <= snakeLength - 1; i++) {
 		snake.push({x: i*grid*velocity, y: 0, rect: new Phaser.Rectangle(i*grid*velocity, 0, grid, grid)});
-		if (i === initSnakeLength - 1) {
+		if (i === snakeLength - 1) {
 			headPosition = {x: i*grid, y: 0};
 		}
 	}
@@ -64,31 +65,55 @@ function moveHeadPosition() {
 	}
 }
 
+function detectCollision() {
+	//detect collision with boundaries
+	if ((snake[snakeLength - 1].x + grid * velocity) >= game.width
+		|| ((snake[snakeLength - 1].x + grid * velocity) <= 0)
+		|| ((snake[snakeLength - 1].y + grid * velocity) <= 0)
+		|| ((snake[snakeLength - 1].y + grid * velocity) >= game.height)) {
+		play = false;
+	}
+	//detect collision with snake parts
+	snake.forEach(function(item, index) {
+		if (index !== (snakeLength - 1)
+			&& ((snake[snakeLength - 1].x) === item.x)
+			&& ((snake[snakeLength - 1].y) === item.y)) {
+			play = false;
+			return false;
+		}
+	});
+}
+
 function update() {
-	if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) && direction !== 'right')
-	{
-		direction = 'left';
-	}
-	else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN) && direction !== 'up')
-	{
-		direction = 'down';
-	}
-	else if (game.input.keyboard.isDown(Phaser.Keyboard.UP) && direction !== 'down')
-	{
-		direction = 'up';
-	}
-	else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) && direction !== 'left')
-	{
-		direction = 'right';
-	}
+	if (play) {
+		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) && direction !== 'right')
+		{
+			direction = 'left';
+		}
+		else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN) && direction !== 'up')
+		{
+			direction = 'down';
+		}
+		else if (game.input.keyboard.isDown(Phaser.Keyboard.UP) && direction !== 'down')
+		{
+			direction = 'up';
+		}
+		else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) && direction !== 'left')
+		{
+			direction = 'right';
+		}
 
-	moveHeadPosition();
+		moveHeadPosition();
 
-	var nextPosition = snake.shift(); //remove first position, tail of the snake
+		snake.shift(); //remove first position, tail of the snake
 
-	//add the new position to the beginning of the array
-	snake.push({x: headPosition.x * velocity, y: headPosition.y * velocity, rect: new Phaser.Rectangle(headPosition.x * velocity, headPosition.y * velocity, grid, grid)});
-	//  Run collision
-	//game.physics.collide(bullets, aliens, collisionHandler, null, this);
+		//add the new position to the beginning of the array
+		snake.push({x: headPosition.x * velocity, y: headPosition.y * velocity, rect: new Phaser.Rectangle(headPosition.x * velocity, headPosition.y * velocity, grid, grid)});
+
+		detectCollision();
+	}
+	else {
+		game.stage.backgroundColor = '#992d2d';
+	}
 }
 
