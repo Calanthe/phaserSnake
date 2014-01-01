@@ -2,66 +2,94 @@
  * Created by zosia on 26/12/13.
  */
 
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'snake', {create: create, update: update, render: render});
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'snake', {preload: preload, create: create, update: update, render: render});
 
+var snakePart;
 var snake = [];
-var snakeLength = 60;
-var food;
+var snakeLength = 5;
+var food = {};
 var grid = 20;
 var direction = 'right';
 var headPosition = [];
 var velocity = 0.2;
 var play = true;
+var score = 0;
+
+function preload() {
+	game.load.image('snakeBody', 'img/snake.gif');
+	game.load.image('snakeHead', 'img/snakehead.gif');
+	game.load.image('fruit', 'img/fruit.gif');
+}
 
 function create() {
-
 	initSnake();
+	//initFood();
+	console.log(snake);
 
-	//console.log(snake);
-
-	//  The score
-	scoreString = 'Score : ';
-	//scoreText = game.add.text(10, 10, scoreString + score, { fontSize: '34px', fill: '#fff' });
-
-	//  And some controls to play the game with
-	cursors = game.input.keyboard.createCursorKeys();
+	//scoreString = 'Score : ';
+	//scoreText = game.add.text(300, 300, scoreString + score, { fontSize: '80px', fill: '#fff' });
 }
 
 function initSnake() {
-	for(var i = 0; i <= snakeLength - 1; i++) {
-		snake.push({x: i*grid*velocity, y: 0, rect: new Phaser.Rectangle(i*grid*velocity, 0, grid, grid)});
+	var i;
+	var x;
+
+	for(i = 0; i <= snakeLength - 1; i++) {
+		x = i * grid;
 		if (i === snakeLength - 1) {
-			headPosition = {x: i*grid, y: 0};
+			headPosition = {
+				x: x,
+				y: 0
+			};
+			snakePart = game.add.sprite(x, 0, 'snakeBody');
 		}
+		else {
+			snakePart = game.add.sprite(x, 0, 'snakeBody');
+		}
+		snake.push({
+			x: x,
+			y: 0,
+			snakePart: snakePart
+		});
 	}
+}
+
+function initFood() {
+	food.x = Math.round(Math.random() * (game.width - grid));
+	food.y = Math.round(Math.random() * (game.height - grid));
+	food.rect = new Phaser.Rectangle(food.x * velocity, food.y * velocity, grid, grid);
+	//console.log(food, snake);
 }
 
 function render() {
 	renderSnake();
-	//TODO renderFood();
+	//renderFood();
 }
 
 function renderSnake() {
 	for(var i = 0; i < snake.length; i++) {
-		var s = snake[i];
 
-		game.debug.renderRectangle(s.rect,'#0FFFFF');
+		game.debug.renderRectangle(snake[i].rect,'#0FFFFF');
 		//same as game.context.fillRect
 	}
 }
 
+function renderFood() {
+	game.debug.renderRectangle(food.rect,'#0FFFFF');
+}
+
 function moveHeadPosition() {
 	if (direction === 'left') {
-		headPosition.x -= grid;
+		headPosition.x -= grid * velocity;
 	}
 	else if (direction === 'right') {
-		headPosition.x += grid;
+		headPosition.x += grid * velocity;
 	}
 	else if (direction === 'down') {
-		headPosition.y += grid;
+		headPosition.y += grid * velocity;
 	}
 	else if (direction === 'up') {
-		headPosition.y -= grid;
+		headPosition.y -= grid * velocity;
 	}
 }
 
@@ -82,6 +110,20 @@ function detectCollision() {
 			return false;
 		}
 	});
+}
+
+function detectFood() {
+	/*if (snake[snakeLength - 1].x === food.x && snake[snakeLength - 1].y === food.y) {
+		game.stage.backgroundColor = '#fff';
+	}*/
+	game.physics.collide(snake[snakeLength-1], food, collisionHandler, null, this);
+}
+
+function collisionHandler (obj1, obj2) {
+
+	game.stage.backgroundColor = '#fff';
+	//console.log(obj1.name + ' collided with ' + obj2.name);
+
 }
 
 function update() {
@@ -105,15 +147,26 @@ function update() {
 
 		moveHeadPosition();
 
-		snake.shift(); //remove first position, tail of the snake
+		var tail = snake.shift(); //remove first position, tail of the snake
+		tail.snakePart.x = snake[snakeLength - 2].x;
+		tail.snakePart.y = snake[snakeLength - 2].y;
 
-		//add the new position to the beginning of the array
-		snake.push({x: headPosition.x * velocity, y: headPosition.y * velocity, rect: new Phaser.Rectangle(headPosition.x * velocity, headPosition.y * velocity, grid, grid)});
+		//add new position to the beginning of the array
+		snake.push({
+			x: headPosition.x,
+			y: headPosition.y,
+			snakePart: tail.snakePart
+		});
+		//console.log(snake);
 
+		//detect collision with boundaries or snake part
 		detectCollision();
+
+		//detect collision with food
+		//detectFood();
 	}
 	else {
-		game.stage.backgroundColor = '#992d2d';
+		//game.stage.backgroundColor = '#992d2d';
 	}
 }
 
