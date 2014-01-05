@@ -11,9 +11,9 @@ var food = {};
 var grid = 20;
 var direction = 'right';
 var headPosition = [];
-var velocity = 0.2;
 var play = true;
 var score = 0;
+var showFrame = false;
 
 function preload() {
 	game.load.image('snakeBody', 'img/snake.gif');
@@ -80,25 +80,25 @@ function renderFood() {
 
 function moveHeadPosition() {
 	if (direction === 'left') {
-		headPosition.x -= grid * velocity;
+		headPosition.x -= grid;
 	}
 	else if (direction === 'right') {
-		headPosition.x += grid * velocity;
+		headPosition.x += grid;
 	}
 	else if (direction === 'down') {
-		headPosition.y += grid * velocity;
+		headPosition.y += grid;
 	}
 	else if (direction === 'up') {
-		headPosition.y -= grid * velocity;
+		headPosition.y -= grid;
 	}
 }
 
 function detectCollision() {
 	//detect collision with boundaries
-	if ((snake[snakeLength - 1].x + grid * velocity) >= game.width
-		|| ((snake[snakeLength - 1].x + grid * velocity) <= 0)
-		|| ((snake[snakeLength - 1].y + grid * velocity) <= 0)
-		|| ((snake[snakeLength - 1].y + grid * velocity) >= game.height)) {
+	if ((snake[snakeLength - 1].x) >= game.width
+		|| ((snake[snakeLength - 1].x + grid) <= 0)
+		|| ((snake[snakeLength - 1].y + grid) <= 0)
+		|| ((snake[snakeLength - 1].y) >= game.height)) {
 		play = false;
 	}
 	//detect collision with snake parts
@@ -127,46 +127,52 @@ function collisionHandler (obj1, obj2) {
 }
 
 function update() {
-	if (play) {
-		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) && direction !== 'right')
-		{
-			direction = 'left';
+	if (showFrame) {
+		if (play) {
+			if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) && direction !== 'right')
+			{
+				direction = 'left';
+			}
+			else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN) && direction !== 'up')
+			{
+				direction = 'down';
+			}
+			else if (game.input.keyboard.isDown(Phaser.Keyboard.UP) && direction !== 'down')
+			{
+				direction = 'up';
+			}
+			else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) && direction !== 'left')
+			{
+				direction = 'right';
+			}
+
+			moveHeadPosition();
+
+			var tail = snake.shift(); //remove first position, tail of the snake
+			tail.snakePart.x = snake[snakeLength - 2].x;
+			tail.snakePart.y = snake[snakeLength - 2].y;
+
+			//add new position to the beginning of the array
+			snake.push({
+				x: headPosition.x,
+				y: headPosition.y,
+				snakePart: tail.snakePart
+			});
+			//console.log(snake);
+
+			//detect collision with boundaries or snake part
+			detectCollision();
+
+			//detect collision with food
+			//detectFood();
 		}
-		else if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN) && direction !== 'up')
-		{
-			direction = 'down';
+		else {
+			game.stage.backgroundColor = '#992d2d';
 		}
-		else if (game.input.keyboard.isDown(Phaser.Keyboard.UP) && direction !== 'down')
-		{
-			direction = 'up';
-		}
-		else if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT) && direction !== 'left')
-		{
-			direction = 'right';
-		}
-
-		moveHeadPosition();
-
-		var tail = snake.shift(); //remove first position, tail of the snake
-		tail.snakePart.x = snake[snakeLength - 2].x;
-		tail.snakePart.y = snake[snakeLength - 2].y;
-
-		//add new position to the beginning of the array
-		snake.push({
-			x: headPosition.x,
-			y: headPosition.y,
-			snakePart: tail.snakePart
-		});
-		//console.log(snake);
-
-		//detect collision with boundaries or snake part
-		detectCollision();
-
-		//detect collision with food
-		//detectFood();
+		showFrame = false;
 	}
 	else {
-		//game.stage.backgroundColor = '#992d2d';
+		showFrame = true;
 	}
 }
 
