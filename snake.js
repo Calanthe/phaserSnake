@@ -2,7 +2,7 @@
  * Created by zosia on 26/12/13.
  */
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, 'snake', {preload: preload, create: create, update: update, render: render});
+var game = new Phaser.Game(800, 600, Phaser.AUTO, 'snake', {preload: preload, create: create, update: update});
 
 var snakePart;
 var snake = [];
@@ -16,14 +16,16 @@ var score = 0;
 var showFrame = false;
 
 function preload() {
+	game.stage.backgroundColor = '#00FF00';
 	game.load.image('snakeBody', 'img/snake.gif');
 	game.load.image('snakeHead', 'img/snakehead.gif');
 	game.load.image('fruit', 'img/fruit.gif');
 }
 
 function create() {
+
 	initSnake();
-	//initFood();
+	initFood();
 	console.log(snake);
 
 	//scoreString = 'Score : ';
@@ -42,9 +44,13 @@ function initSnake() {
 				y: 0
 			};
 			snakePart = game.add.sprite(x, 0, 'snakeBody');
+			snakePart.body.customSeparateX = true;
+			snakePart.body.customSeparateY = true;
 		}
 		else {
 			snakePart = game.add.sprite(x, 0, 'snakeBody');
+			snakePart.body.customSeparateX = true;
+			snakePart.body.customSeparateY = true;
 		}
 		snake.push({
 			x: x,
@@ -55,27 +61,15 @@ function initSnake() {
 }
 
 function initFood() {
-	food.x = Math.round(Math.random() * (game.width - grid));
-	food.y = Math.round(Math.random() * (game.height - grid));
-	food.rect = new Phaser.Rectangle(food.x * velocity, food.y * velocity, grid, grid);
-	//console.log(food, snake);
+	food.x = getRandomInt(0, game.width);
+	food.y = getRandomInt(0, game.height);
+	food.icon = game.add.sprite(food.x, food.y, 'fruit');
+	//food.icon = game.add.sprite(200, 0, 'fruit');
 }
 
-function render() {
-	renderSnake();
-	//renderFood();
-}
-
-function renderSnake() {
-	for(var i = 0; i < snake.length; i++) {
-
-		game.debug.renderRectangle(snake[i].rect,'#0FFFFF');
-		//same as game.context.fillRect
-	}
-}
-
-function renderFood() {
-	game.debug.renderRectangle(food.rect,'#0FFFFF');
+// Returns a random integer between min and max
+function getRandomInt(min, max) {
+	return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 function moveHeadPosition() {
@@ -94,6 +88,7 @@ function moveHeadPosition() {
 }
 
 function detectCollision() {
+	//could be done better?
 	//detect collision with boundaries
 	if ((snake[snakeLength - 1].x) >= game.width
 		|| ((snake[snakeLength - 1].x + grid) <= 0)
@@ -110,24 +105,26 @@ function detectCollision() {
 			return false;
 		}
 	});
+	//game.physics.collide(snake[snakeLength-1].snakePart, food.icon, collisionHandler, null, this);
 }
 
 function detectFood() {
 	/*if (snake[snakeLength - 1].x === food.x && snake[snakeLength - 1].y === food.y) {
 		game.stage.backgroundColor = '#fff';
 	}*/
-	game.physics.collide(snake[snakeLength-1], food, collisionHandler, null, this);
+	console.log(snake[snakeLength-1].snakePart, food.icon);
+	game.physics.collide(snake[snakeLength-1].snakePart, food.icon, collisionHandler, null, this);
+	//food.icon.kill();?
+	//kill food?
 }
 
 function collisionHandler (obj1, obj2) {
-
-	game.stage.backgroundColor = '#fff';
-	//console.log(obj1.name + ' collided with ' + obj2.name);
-
+	game.stage.backgroundColor = '#992d2d';
+	play = false;
 }
 
 function update() {
-	if (showFrame) {
+	if (showFrame) { //could be done better?
 		if (play) {
 			if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) && direction !== 'right')
 			{
@@ -148,9 +145,12 @@ function update() {
 
 			moveHeadPosition();
 
+			//is it the best solution? I just copy removed sprite and change its positions
 			var tail = snake.shift(); //remove first position, tail of the snake
-			tail.snakePart.x = snake[snakeLength - 2].x;
-			tail.snakePart.y = snake[snakeLength - 2].y;
+			//tail.snakePart.x = headPosition.x;
+			//tail.snakePart.y = headPosition.y;
+			tail.snakePart.body.x = headPosition.x; //to check collisions
+			tail.snakePart.body.y = headPosition.y;
 
 			//add new position to the beginning of the array
 			snake.push({
@@ -158,13 +158,16 @@ function update() {
 				y: headPosition.y,
 				snakePart: tail.snakePart
 			});
-			//console.log(snake);
+
+			/*snake.forEach(function(item){
+				item.snakePart.body.velocity.x = grid;
+			});*/
 
 			//detect collision with boundaries or snake part
 			detectCollision();
 
 			//detect collision with food
-			//detectFood();
+			detectFood();
 		}
 		else {
 			game.stage.backgroundColor = '#992d2d';
