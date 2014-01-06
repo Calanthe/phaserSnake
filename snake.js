@@ -14,6 +14,8 @@ var headPosition = [];
 var play = true;
 var score = 0;
 var showFrame = false;
+var availableXpos = [];
+var availableYpos = [];
 
 function preload() {
 	game.stage.backgroundColor = '#00FF00';
@@ -23,13 +25,29 @@ function preload() {
 }
 
 function create() {
-
+	genAvailableFoodPositions();
 	initSnake();
 	initFood();
-	console.log(snake);
 
 	//scoreString = 'Score : ';
 	//scoreText = game.add.text(300, 300, scoreString + score, { fontSize: '80px', fill: '#fff' });
+}
+
+function genAvailableFoodPositions() {
+	var i;
+	var j;
+
+	for (i = 0; i <= game.width; i++) {
+		if (i % grid === 0) {
+			availableXpos.push(i);
+		}
+	}
+
+	for (j = 0; j <= game.height; j++) {
+		if (j % grid === 0) {
+			availableYpos.push(j);
+		}
+	}
 }
 
 function initSnake() {
@@ -61,15 +79,30 @@ function initSnake() {
 }
 
 function initFood() {
-	food.x = getRandomInt(0, game.width);
-	food.y = getRandomInt(0, game.height);
+	var x;
+	var y;
+
+	do {
+		x = availableXpos[Math.floor(Math.random() * availableXpos.length)];
+		y = availableYpos[Math.floor(Math.random() * availableYpos.length)];
+	} while (compareWithSnake(x,y)); //check if generated food's position is not the same as snake's body
+
+	food.x = x;
+	food.y = y;
 	food.icon = game.add.sprite(food.x, food.y, 'fruit');
-	//food.icon = game.add.sprite(200, 0, 'fruit');
 }
 
-// Returns a random integer between min and max
-function getRandomInt(min, max) {
-	return Math.floor(Math.random() * (max - min + 1) + min);
+function compareWithSnake(x, y) {
+	var collision = false;
+
+	snake.forEach(function(item) {
+		if (item.x === x && item.y === y) {
+			collision = true;
+			return false;
+		}
+	});
+
+	return collision;
 }
 
 function moveHeadPosition() {
@@ -90,7 +123,7 @@ function moveHeadPosition() {
 function detectCollision() {
 	//could be done better?
 	//detect collision with boundaries
-	if ((snake[snakeLength - 1].x) >= game.width
+	if ((snake[snakeLength - 1].x + grid) >= game.width
 		|| ((snake[snakeLength - 1].x + grid) <= 0)
 		|| ((snake[snakeLength - 1].y + grid) <= 0)
 		|| ((snake[snakeLength - 1].y) >= game.height)) {
@@ -112,13 +145,13 @@ function detectFood() {
 	/*if (snake[snakeLength - 1].x === food.x && snake[snakeLength - 1].y === food.y) {
 		game.stage.backgroundColor = '#fff';
 	}*/
-	console.log(snake[snakeLength-1].snakePart, food.icon);
+	//console.log(snake[snakeLength-1].snakePart, food.icon);
 	game.physics.collide(snake[snakeLength-1].snakePart, food.icon, collisionHandler, null, this);
 	//food.icon.kill();?
 	//kill food?
 }
 
-function collisionHandler (obj1, obj2) {
+function collisionHandler(obj1, obj2) {
 	game.stage.backgroundColor = '#992d2d';
 	play = false;
 }
