@@ -13,12 +13,13 @@ var direction = 'right';
 var headPosition = [];
 var play = true;
 var score = 0;
+var scoreText;
 var showFrame = false;
 var availableXpos = [];
 var availableYpos = [];
 
 function preload() {
-	game.stage.backgroundColor = '#00FF00';
+	game.stage.backgroundColor = '#98ED00';
 	game.load.image('snakeBody', 'img/snake.gif');
 	game.load.image('snakeHead', 'img/snakehead.gif');
 	game.load.image('fruit', 'img/fruit.gif');
@@ -29,21 +30,20 @@ function create() {
 	initSnake();
 	initFood();
 
-	//scoreString = 'Score : ';
-	//scoreText = game.add.text(300, 300, scoreString + score, { fontSize: '80px', fill: '#fff' });
+	scoreText = game.add.text(10, 566, 'Score : ' + score, { fontSize: '30px', fill: '#fff' });
 }
 
 function genAvailableFoodPositions() {
 	var i;
 	var j;
 
-	for (i = 0; i <= game.width; i++) {
+	for (i = 0; i < game.width; i++) {
 		if (i % grid === 0) {
 			availableXpos.push(i);
 		}
 	}
 
-	for (j = 0; j <= game.height; j++) {
+	for (j = 0; j < game.height; j++) {
 		if (j % grid === 0) {
 			availableYpos.push(j);
 		}
@@ -52,29 +52,24 @@ function genAvailableFoodPositions() {
 
 function initSnake() {
 	var i;
-	var x;
-
+//TODO add some music?
+//TODO add head
 	for(i = 0; i <= snakeLength - 1; i++) {
-		x = i * grid;
 		if (i === snakeLength - 1) {
 			headPosition = {
-				x: x,
+				x: i * grid,
 				y: 0
 			};
-			snakePart = game.add.sprite(x, 0, 'snakeBody');
-			snakePart.body.customSeparateX = true;
-			snakePart.body.customSeparateY = true;
+			snakePart = game.add.sprite(i * grid, 0, 'snakeBody');
+			/*snakePart.body.customSeparateX = true;
+			snakePart.body.customSeparateY = true;*/
 		}
 		else {
-			snakePart = game.add.sprite(x, 0, 'snakeBody');
-			snakePart.body.customSeparateX = true;
-			snakePart.body.customSeparateY = true;
+			snakePart = game.add.sprite(i * grid, 0, 'snakeBody');
+			/*snakePart.body.customSeparateX = true;
+			snakePart.body.customSeparateY = true;*/
 		}
-		snake.push({
-			x: x,
-			y: 0,
-			snakePart: snakePart
-		});
+		snake.push(snakePart);
 	}
 }
 
@@ -87,16 +82,16 @@ function initFood() {
 		y = availableYpos[Math.floor(Math.random() * availableYpos.length)];
 	} while (compareWithSnake(x,y)); //check if generated food's position is not the same as snake's body
 
-	food.x = x;
-	food.y = y;
-	food.icon = game.add.sprite(food.x, food.y, 'fruit');
+	food = game.add.sprite(x, y, 'fruit');
+	food.body.customSeparateX = true;
+	food.body.customSeparateY = true;
 }
 
 function compareWithSnake(x, y) {
 	var collision = false;
 
 	snake.forEach(function(item) {
-		if (item.x === x && item.y === y) {
+		if (item.body.x === x && item.body.y === y) {
 			collision = true;
 			return false;
 		}
@@ -123,41 +118,45 @@ function moveHeadPosition() {
 function detectCollision() {
 	//could be done better?
 	//detect collision with boundaries
-	if ((snake[snakeLength - 1].x + grid) >= game.width
-		|| ((snake[snakeLength - 1].x + grid) <= 0)
-		|| ((snake[snakeLength - 1].y + grid) <= 0)
-		|| ((snake[snakeLength - 1].y) >= game.height)) {
+	//TODO add fancy effect
+	//TODO test it
+	if ((snake[snakeLength - 1].body.x + grid) >= game.width
+		|| ((snake[snakeLength - 1].body.x) <= 0)
+		|| ((snake[snakeLength - 1].body.y + grid) <= 0)
+		|| ((snake[snakeLength - 1].body.y + grid) >= game.height)) {
 		play = false;
 	}
+	//TODO test it
 	//detect collision with snake parts
 	snake.forEach(function(item, index) {
 		if (index !== (snakeLength - 1)
-			&& ((snake[snakeLength - 1].x) === item.x)
-			&& ((snake[snakeLength - 1].y) === item.y)) {
+			&& ((snake[snakeLength - 1].body.x) === item.body.x)
+			&& ((snake[snakeLength - 1].body.y) === item.body.y)) {
 			play = false;
 			return false;
 		}
 	});
-	//game.physics.collide(snake[snakeLength-1].snakePart, food.icon, collisionHandler, null, this);
+	//detect collision with food
+	game.physics.collide(snake[snakeLength-1], food, foodCollisionHandler, null, this);
 }
 
-function detectFood() {
-	/*if (snake[snakeLength - 1].x === food.x && snake[snakeLength - 1].y === food.y) {
-		game.stage.backgroundColor = '#fff';
-	}*/
-	//console.log(snake[snakeLength-1].snakePart, food.icon);
-	game.physics.collide(snake[snakeLength-1].snakePart, food.icon, collisionHandler, null, this);
-	//food.icon.kill();?
-	//kill food?
-}
+function foodCollisionHandler(snakeHead, food) {
+	var newSnakePart;
 
-function collisionHandler(obj1, obj2) {
-	game.stage.backgroundColor = '#992d2d';
-	play = false;
+	moveHeadPosition();
+	newSnakePart = game.add.sprite(headPosition.x, headPosition.y, 'snakeBody');
+	snake.push(
+		newSnakePart
+	);
+	score += 100;
+	snakeLength++;
+	food.destroy();
+	initFood();
+	scoreText.setText('Score : ' + score);
 }
 
 function update() {
-	if (showFrame) { //could be done better?
+	if (showFrame) { //could be done better? I cant change velocity
 		if (play) {
 			if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) && direction !== 'right')
 			{
@@ -182,28 +181,17 @@ function update() {
 			var tail = snake.shift(); //remove first position, tail of the snake
 			//tail.snakePart.x = headPosition.x;
 			//tail.snakePart.y = headPosition.y;
-			tail.snakePart.body.x = headPosition.x; //to check collisions
-			tail.snakePart.body.y = headPosition.y;
+			tail.body.x = headPosition.x; //to check collisions
+			tail.body.y = headPosition.y;
 
 			//add new position to the beginning of the array
-			snake.push({
-				x: headPosition.x,
-				y: headPosition.y,
-				snakePart: tail.snakePart
-			});
-
-			/*snake.forEach(function(item){
-				item.snakePart.body.velocity.x = grid;
-			});*/
+			snake.push(tail);
 
 			//detect collision with boundaries or snake part
 			detectCollision();
-
-			//detect collision with food
-			detectFood();
 		}
 		else {
-			game.stage.backgroundColor = '#992d2d';
+			game.stage.backgroundColor = '#FF4540';
 		}
 		showFrame = false;
 	}
