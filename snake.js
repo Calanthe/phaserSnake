@@ -9,6 +9,7 @@ var snake = [];
 var snakeLength = 5;
 var food = {};
 var grid = 20;
+var velocity = 80;
 var direction = 'right';
 var headPosition = [];
 var play = true;
@@ -73,6 +74,33 @@ function initSnake() {
 	}
 }
 
+/*function initSnake() {
+	var i;
+	var head;
+	var body;
+//TODO add some music?
+//TODO add head
+
+// Create snake group with all of its parts
+	snake = game.add.group();
+	for(i = 0; i <= snakeLength - 1; i++) {
+		if (i === snakeLength - 1) {
+//add head to snake group
+			head = snake.create(i * grid, 0, 'snakeHead');
+			head.body.velocity.x = +velocity;
+//snakePart = game.add.sprite(i * grid, 0, 'snakeHead');
+		}
+		else {
+//add body to snake group
+			body = snake.create(i * grid, 0, 'snakeBody');
+			body.body.velocity.x = +velocity;
+//snakePart = game.add.sprite(i * grid, 0, 'snakeBody');
+		}
+//snake.push(snakePart);
+	}
+} */
+
+
 function initFood() {
 	var x;
 	var y;
@@ -114,6 +142,38 @@ function moveHeadPosition() {
 		headPosition.y -= grid;
 	}
 }
+
+/*function moveHeadPosition() {
+	var nextElem;
+//could be done better?
+	snake._container.children.forEach(function(item, index) {
+		if (index + 1 < snakeLength) {
+			nextElem = snake._container.children[index + 1];
+			if (nextElem) {
+
+				// item.body.velocity.x = nextElem.body.velocity.x;
+				// item.body.velocity.y = nextElem.body.velocity.y;
+				item.body.x = nextElem.body.x;
+				item.body.y = nextElem.body.y;
+			}
+		}
+		else if (index + 1 === snakeLength) {
+			if (direction === 'left') {
+				item.body.velocity.x = -velocity;
+			}
+			else if (direction === 'right') {
+				item.body.velocity.x = velocity;
+			}
+			else if (direction === 'down') {
+				item.body.velocity.y = velocity;
+			}
+			else if (direction === 'up') {
+				item.body.velocity.y = -velocity;
+			}
+		}
+	});
+} */
+
 
 function detectCollision() {
 	//could be done better?
