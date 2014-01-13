@@ -51,10 +51,9 @@ function genAvailableFoodPositions() {
 	}
 }
 
-function initSnake() {
+/*function initSnake() {
 	var i;
-//TODO add some music?
-//TODO add head
+
 	for(i = 0; i <= snakeLength - 1; i++) {
 		if (i === snakeLength - 1) {
 			headPosition = {
@@ -62,43 +61,32 @@ function initSnake() {
 				y: 0
 			};
 			snakePart = game.add.sprite(i * grid, 0, 'snakeBody');
-			/*snakePart.body.customSeparateX = true;
-			snakePart.body.customSeparateY = true;*/
 		}
 		else {
 			snakePart = game.add.sprite(i * grid, 0, 'snakeBody');
-			/*snakePart.body.customSeparateX = true;
-			snakePart.body.customSeparateY = true;*/
 		}
 		snake.push(snakePart);
 	}
-}
+} */
 
-/*function initSnake() {
+function initSnake() {
 	var i;
 	var head;
 	var body;
-//TODO add some music?
-//TODO add head
 
 // Create snake group with all of its parts
 	snake = game.add.group();
 	for(i = 0; i <= snakeLength - 1; i++) {
 		if (i === snakeLength - 1) {
-//add head to snake group
 			head = snake.create(i * grid, 0, 'snakeHead');
 			head.body.velocity.x = +velocity;
-//snakePart = game.add.sprite(i * grid, 0, 'snakeHead');
 		}
 		else {
-//add body to snake group
 			body = snake.create(i * grid, 0, 'snakeBody');
 			body.body.velocity.x = +velocity;
-//snakePart = game.add.sprite(i * grid, 0, 'snakeBody');
 		}
-//snake.push(snakePart);
 	}
-} */
+}
 
 
 function initFood() {
@@ -128,7 +116,7 @@ function compareWithSnake(x, y) {
 	return collision;
 }
 
-function moveHeadPosition() {
+/*function moveHeadPosition() {
 	if (direction === 'left') {
 		headPosition.x -= grid;
 	}
@@ -141,16 +129,16 @@ function moveHeadPosition() {
 	else if (direction === 'up') {
 		headPosition.y -= grid;
 	}
-}
+} */
 
-/*function moveHeadPosition() {
+function moveHeadPosition() {
 	var nextElem;
 //could be done better?
 	snake._container.children.forEach(function(item, index) {
 		if (index + 1 < snakeLength) {
 			nextElem = snake._container.children[index + 1];
 			if (nextElem) {
-
+				//another solution
 				// item.body.velocity.x = nextElem.body.velocity.x;
 				// item.body.velocity.y = nextElem.body.velocity.y;
 				item.body.x = nextElem.body.x;
@@ -172,21 +160,18 @@ function moveHeadPosition() {
 			}
 		}
 	});
-} */
+}
 
 
-function detectCollision() {
-	//could be done better?
+/*function detectCollision() {
+	//could be done better? not sure if 100% works
 	//detect collision with boundaries
-	//TODO add fancy effect
-	//TODO test it
 	if ((snake[snakeLength - 1].body.x + grid) >= game.width
 		|| ((snake[snakeLength - 1].body.x) <= 0)
 		|| ((snake[snakeLength - 1].body.y + grid) <= 0)
 		|| ((snake[snakeLength - 1].body.y + grid) >= game.height)) {
 		play = false;
 	}
-	//TODO test it
 	//detect collision with snake parts
 	snake.forEach(function(item, index) {
 		if (index !== (snakeLength - 1)
@@ -198,7 +183,7 @@ function detectCollision() {
 	});
 	//detect collision with food
 	game.physics.collide(snake[snakeLength-1], food, foodCollisionHandler, null, this);
-}
+} */
 
 function foodCollisionHandler(snakeHead, food) {
 	var newSnakePart;
@@ -216,7 +201,7 @@ function foodCollisionHandler(snakeHead, food) {
 }
 
 function update() {
-	if (showFrame) { //could be done better? I cant change velocity
+	//if (showFrame) {
 		if (play) {
 			if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) && direction !== 'right')
 			{
@@ -237,10 +222,7 @@ function update() {
 
 			moveHeadPosition();
 
-			//is it the best solution? I just copy removed sprite and change its positions
-			var tail = snake.shift(); //remove first position, tail of the snake
-			//tail.snakePart.x = headPosition.x;
-			//tail.snakePart.y = headPosition.y;
+			/*var tail = snake.shift(); //remove first position, tail of the snake
 			tail.body.x = headPosition.x; //to check collisions
 			tail.body.y = headPosition.y;
 
@@ -248,15 +230,15 @@ function update() {
 			snake.push(tail);
 
 			//detect collision with boundaries or snake part
-			detectCollision();
+			detectCollision();*/
 		}
 		else {
 			game.stage.backgroundColor = '#FF4540';
 		}
-		showFrame = false;
+	/*	showFrame = false;
 	}
 	else {
 		showFrame = true;
-	}
+	}*/
 }
 
