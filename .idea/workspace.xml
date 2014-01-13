@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5e9dfe48-0867-43a6-bf46-8427d46dad6e" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/snake.js" afterPath="$PROJECT_DIR$/snake.js" />
-    </list>
+    <list default="true" id="5e9dfe48-0867-43a6-bf46-8427d46dad6e" name="Default" comment="" />
     <ignored path="PhaserSnake.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="TRACKING_ENABLED" value="true" />
