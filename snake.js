@@ -51,7 +51,7 @@ function genAvailableFoodPositions() {
 	}
 }
 
-/*function initSnake() {
+function initSnake() {
 	var i;
 
 	for(i = 0; i <= snakeLength - 1; i++) {
@@ -67,9 +67,9 @@ function genAvailableFoodPositions() {
 		}
 		snake.push(snakePart);
 	}
-} */
+}
 
-function initSnake() {
+/*function initSnake() {
 	var i;
 	var head;
 	var body;
@@ -86,7 +86,7 @@ function initSnake() {
 			body.body.velocity.x = +velocity;
 		}
 	}
-}
+}*/
 
 
 function initFood() {
@@ -116,7 +116,7 @@ function compareWithSnake(x, y) {
 	return collision;
 }
 
-/*function moveHeadPosition() {
+function moveHeadPosition() {
 	if (direction === 'left') {
 		headPosition.x -= grid;
 	}
@@ -129,9 +129,9 @@ function compareWithSnake(x, y) {
 	else if (direction === 'up') {
 		headPosition.y -= grid;
 	}
-} */
+}
 
-function moveHeadPosition() {
+/*function moveHeadPosition() {
 	var nextElem;
 //could be done better?
 	snake._container.children.forEach(function(item, index) {
@@ -160,10 +160,10 @@ function moveHeadPosition() {
 			}
 		}
 	});
-}
+}*/
 
 
-/*function detectCollision() {
+function detectCollision() {
 	//could be done better? not sure if 100% works
 	//detect collision with boundaries
 	if ((snake[snakeLength - 1].body.x + grid) >= game.width
@@ -183,7 +183,7 @@ function moveHeadPosition() {
 	});
 	//detect collision with food
 	game.physics.collide(snake[snakeLength-1], food, foodCollisionHandler, null, this);
-} */
+}
 
 function foodCollisionHandler(snakeHead, food) {
 	var newSnakePart;
@@ -201,7 +201,7 @@ function foodCollisionHandler(snakeHead, food) {
 }
 
 function update() {
-	//if (showFrame) {
+	if (showFrame) {
 		if (play) {
 			if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT) && direction !== 'right')
 			{
@@ -222,7 +222,7 @@ function update() {
 
 			moveHeadPosition();
 
-			/*var tail = snake.shift(); //remove first position, tail of the snake
+			var tail = snake.shift(); //remove first position, tail of the snake
 			tail.body.x = headPosition.x; //to check collisions
 			tail.body.y = headPosition.y;
 
@@ -230,15 +230,15 @@ function update() {
 			snake.push(tail);
 
 			//detect collision with boundaries or snake part
-			detectCollision();*/
+			detectCollision();
 		}
 		else {
 			game.stage.backgroundColor = '#FF4540';
 		}
-	/*	showFrame = false;
+		showFrame = false;
 	}
 	else {
 		showFrame = true;
-	}*/
+	}
 }
 
